@@ -23,7 +23,8 @@ return new class extends Migration
             $table->dateTime('end_date');
             //Chờ vào, Đang vào, Đã ra
             $table->enum('status', ['waiting_entry', 'entering', 'exited']);
-            $table->foreignId('id_registration_vehicle')->constrained('registration_vehicles')->onDelete('cascade');
+            // 1-1 relationship: each registration_directlie belongs to one registration_vehicle
+            $table->foreignId('id_registration_vehicle')->nullable()->unique()->constrained('registration_vehicles')->onDelete('cascade');
             $table->timestamps();
         });
     }
