@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('registration_vehicles', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('driver_name');
+            $table->string('driver_id_card');
+            $table->string('license_plate');
+            $table->string('load_capacity');
+            $table->string('entry_gate')->nullable();
+            $table->timestamp('expected_arrival_time');
+            $table->text('notes')->nullable();
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            // Cần phê duyệt, Đã vào, Đã ra, Đã phê duyệt, Từ chối
+            $table->enum('status', ['pending_approval', 'entered', 'exited', 'approved', 'rejected']);
             $table->timestamps();
         });
     }
