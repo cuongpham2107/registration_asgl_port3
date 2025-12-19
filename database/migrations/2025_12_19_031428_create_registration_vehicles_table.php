@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             // Cần phê duyệt, Đã vào, Đã ra, Đã phê duyệt, Từ chối
             $table->enum('status', ['pending_approval', 'entered', 'exited', 'approved', 'rejected']);
+            $table->foreignId('id_registration_directlie')->constrained('registration_directlies')->onDelete('cascade');
             $table->timestamps();
         });
     }

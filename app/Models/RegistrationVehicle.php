@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegistrationVehicle extends Model
 {
-    //
+    protected $guarded = [];
+
+    
 }
