@@ -14,4 +14,9 @@ class RegistrationVehicle extends Model
     {
         return $this->hasOne(RegistrationDirectly::class, 'id_registration_vehicle');
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

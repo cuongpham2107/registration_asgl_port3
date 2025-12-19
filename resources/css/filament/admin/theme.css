@@ -1,4 +1,16 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/* Add your custom styles below */
+
+.fi-ta-table thead tr {
+    background-color: #5287ad !important;
+    border: 1px solid #ffffff !important;
+}
+table.fi-ta-table thead .fi-ta-header-cell {
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 600;
+}
