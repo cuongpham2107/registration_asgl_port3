@@ -9,18 +9,19 @@ use App\Filament\Resources\Companies\Schemas\CompanyForm;
 use App\Filament\Resources\Companies\Tables\CompaniesTable;
 use App\Models\Company;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Enums\NavigationGroup;
 
 class CompanyResource extends Resource
 {
     protected static ?string $model = Company::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHomeModern;
-
     protected static ?string $navigationLabel = 'Đơn vị cung cấp';
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::DANH_MUC;
 
     protected static ?string $recordTitleAttribute = 'name';
 

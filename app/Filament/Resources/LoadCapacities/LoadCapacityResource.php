@@ -9,16 +9,19 @@ use App\Filament\Resources\LoadCapacities\Schemas\LoadCapacityForm;
 use App\Filament\Resources\LoadCapacities\Tables\LoadCapacitiesTable;
 use App\Models\LoadCapacity;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Enums\NavigationGroup;
 
 class LoadCapacityResource extends Resource
 {
     protected static ?string $model = LoadCapacity::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?string $navigationLabel = 'Tải trọng';
+    protected static string | UnitEnum | null $navigationGroup = NavigationGroup::DANH_MUC;
 
     protected static ?string $recordTitleAttribute = 'name';
 

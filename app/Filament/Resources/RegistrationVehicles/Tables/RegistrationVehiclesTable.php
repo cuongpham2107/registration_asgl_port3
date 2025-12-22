@@ -29,12 +29,12 @@ class RegistrationVehiclesTable
                 TextColumn::make('license_plate')
                     ->label('Biển số xe')
                     ->searchable(),
-                TextColumn::make('load_capacity')
+                TextColumn::make('loadCapacity.name')
                     ->label('Tải trọng')
                     ->alignCenter()
                     ->formatStateUsing(fn ($state) => "{$state} tấn")
                     ->searchable(),
-                TextColumn::make('entry_gate')
+                TextColumn::make('gateway.name')
                     ->label('Cổng vào')
                     ->alignCenter()
                     ->searchable(),

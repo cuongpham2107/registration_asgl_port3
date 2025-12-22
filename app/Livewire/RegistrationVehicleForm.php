@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Models\Company;
+use App\Models\Gateway;
+use App\Models\LoadCapacity;
 use App\Models\RegistrationVehicle;
 use Illuminate\Support\HtmlString;
 use Filament\Notifications\Notification;
@@ -27,7 +29,6 @@ use Livewire\Component;
 use App\Filament\Resources\RegistrationVehicles\Actions\ImportAction;
 use Filament\Schemas\Components\Icon;
 use Filament\Support\Icons\Heroicon;
- use Filament\Schemas\Components\FusedGroup;
 
 class RegistrationVehicleForm extends Component implements HasActions, HasForms
 {
@@ -116,10 +117,9 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             TableColumn::make('Tên lái xe'),
                             TableColumn::make('CMND/CCCD'),
                             TableColumn::make('Biển số xe'),
-                            TableColumn::make('Tải trọng')
-                                ->width('50px'),
+                            TableColumn::make('Tải trọng'),
                             TableColumn::make('Cổng vào')
-                                ->width('50px'),
+                                ->width('150px'),
                             TableColumn::make('Thời gian dự kiến vào'),
                             TableColumn::make('Ghi chú'),
                         ])
@@ -130,15 +130,17 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                                 ->required(),
                             TextInput::make('license_plate')
                                 ->required(),
-                            TextInput::make('load_capacity')
+                            Select::make('id_load_capacity')
                                 ->required()
-                                ->numeric(),
-                            TextInput::make('entry_gate')
+                                ->options(LoadCapacity::pluck('name', 'id')),
+                            Select::make('id_gateway')
+                                ->placeholder('Chọn cổng vào')
                                 ->required()
-                                ->numeric(),
+                                ->options(Gateway::pluck('name', 'id')),
                             DateTimePicker::make('expected_arrival_time')
                                 ->format('d/m/Y H:i')
                                 ->seconds(false)
+                                ->native(false)
                                 ->required(),
                             Textarea::make('notes')
                                 ->rows(1)
@@ -168,15 +170,15 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             ->label('Biển số xe')
                             ->required()
                             ->columnSpan(2),
-                        TextInput::make('load_capacity')
+                        Select::make(name: 'id_load_capacity')
                             ->label('Tải trọng')
                             ->required()
-                            ->numeric()
+                            ->options(LoadCapacity::pluck('name', 'id'))
                             ->columnSpan(2),
-                        TextInput::make('entry_gate')
+                        Select::make('id_gateway')
                             ->label('Cổng vào')
                             ->required()
-                            ->numeric()
+                            ->options(Gateway::pluck('name', 'id'))
                             ->columnSpan(2),
                         DateTimePicker::make('expected_arrival_time')
                             ->label('Thời gian dự kiến vào')
@@ -186,9 +188,8 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             ->columnSpanFull(),
                         Select::make('company_id')
                             ->label('Thuộc đơn vị')
-                            ->options(\App\Models\Company::pluck('name', 'id'))
+                            ->options(Company::pluck('name', 'id'))
                             ->searchable()
-                            ->required()
                             ->columnSpanFull(),
                         Textarea::make('notes')
                             ->label('Ghi chú')
@@ -235,8 +236,6 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
             'registration_vehicles.*.driver_name' => ['required', 'string'],
             'registration_vehicles.*.driver_id_card' => ['required', 'string'],
             'registration_vehicles.*.license_plate' => ['required', 'string'],
-            'registration_vehicles.*.load_capacity' => ['required'],
-            'registration_vehicles.*.entry_gate' => ['nullable'],
             'registration_vehicles.*.expected_arrival_time' => ['required'],
             'registration_vehicles.*.notes' => ['nullable'],
         ];
@@ -307,8 +306,8 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                     'driver_name' => $rv['driver_name'] ?? null,
                     'driver_id_card' => $rv['driver_id_card'] ?? null,
                     'license_plate' => $rv['license_plate'] ?? null,
-                    'load_capacity' => $rv['load_capacity'] ?? null,
-                    'entry_gate' => $rv['entry_gate'] ?? null,
+                    'id_load_capacity' => $rv['id_load_capacity'] ?? null,
+                    'id_gateway' => $rv['id_gateway'] ?? null,
                     'expected_arrival_time' => $expectedCarbon,
                     'notes' => $rv['notes'] ?? null,
                     'company_id' => $companyId,

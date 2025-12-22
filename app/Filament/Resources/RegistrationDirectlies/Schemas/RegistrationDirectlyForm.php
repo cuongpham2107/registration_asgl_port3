@@ -31,13 +31,14 @@ class RegistrationDirectlyForm
                             ->label('Biển số xe')
                             ->required()
                             ->columnSpan(2),
-                        TextInput::make('load_capacity')
+                        Select::make('id_load_capacity')
                             ->label('Tải trọng')
+                            ->relationship('loadCapacity', 'name')
                             ->required()
                             ->columnSpan(2),
-                        TextInput::make('entry_gate')
+                        Select::make('id_gateway')
                             ->label('Cổng vào')
-                            ->numeric()
+                            ->relationship('gateway', 'name')
                             ->columnSpan(2),
                         DateTimePicker::make('expected_arrival_time')
                             ->label('Thời gian dự kiến vào')
