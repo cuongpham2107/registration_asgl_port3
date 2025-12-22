@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Companies\Tables;
+namespace App\Filament\Resources\LoadCapacities\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -8,27 +8,24 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class CompaniesTable
+class LoadCapacitiesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Tên đơn vị')
+                    ->label('Tên tải trọng')
+                    ->sortable()
                     ->searchable(),
-                TextColumn::make('address')
-                    ->label('Địa chỉ')
-                    ->searchable(),
-                TextColumn::make('phone_number')
-                    ->label('Số điện thoại')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('Địa chỉ email')
-                    ->searchable(),
-                TextColumn::make('tax_number')
-                    ->label('Mã số thuế')
-                    ->searchable(),
+                TextColumn::make('daytime_price')
+                    ->label('Giá vé ban ngày')
+                    ->money()
+                    ->sortable(),
+                TextColumn::make('nighttime_price')
+                    ->label('Giá vé ban đêm')
+                    ->money()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime()

@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('driver_name');
             $table->string('driver_id_card');
             $table->string('license_plate');
-            $table->string('load_capacity');
-            $table->string('entry_gate')->nullable();
-            $table->timestamp('expected_arrival_time');
+            $table->foreignId('id_load_capacity')->nullable()->constrained('load_capacities')->onDelete('set null');
+            $table->foreignId('id_gateway')->nullable()->constrained('gateways')->onDelete('set null');
+            $table->timestamp('expected_arrival_time')->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->timestamp('approval_date')->nullable();
             // Cần phê duyệt, Đã vào, Đã ra, Đã phê duyệt, Từ chối
-            $table->enum('status', ['pending_approval', 'entered', 'exited', 'approved', 'rejected']);
+            $table->enum('status', ['pending_approval', 'entered', 'exited', 'approved', 'rejected'])->default('pending_approval');
             $table->timestamps();
         });
     }

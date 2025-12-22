@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\RegistrationVehicles\Tables;
 
-use Filament\Actions\BulkActionGroup;
+use App\Filament\Resources\RegistrationVehicles\Actions\ApprovesAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Enums\RecordActionsPosition;
+use Filament\Tables\Grouping\Group;
 
 class RegistrationVehiclesTable
 {
@@ -27,9 +31,12 @@ class RegistrationVehiclesTable
                     ->searchable(),
                 TextColumn::make('load_capacity')
                     ->label('Tải trọng')
+                    ->alignCenter()
+                    ->formatStateUsing(fn ($state) => "{$state} tấn")
                     ->searchable(),
                 TextColumn::make('entry_gate')
                     ->label('Cổng vào')
+                    ->alignCenter()
                     ->searchable(),
                 TextColumn::make('expected_arrival_time')
                     ->label('Thời gian dự kiến vào')
@@ -41,6 +48,27 @@ class RegistrationVehiclesTable
                 TextColumn::make('status')
                     ->label('Trạng thái')
                     ->sortable()
+                    ->formatStateUsing(function ($state) {
+                        return match ($state) {
+                            'pending_approval' => 'Chờ duyệt',
+                            'approved' => 'Đã duyệt',
+                            'entered' => 'Đã vào',
+                            'exited' => 'Đã ra',
+                            'rejected' => 'Từ chối',
+                            default => $state,
+                        };
+                    })
+                    ->color(function ($state) {
+                        return match ($state) {
+                            'pending_approval' => 'warning',
+                            'approved' => 'info',
+                            'entered' => 'success',
+                            'exited' => 'danger',
+                            'rejected' => 'gray',
+                            default => 'primary',
+                        };
+                    })
+                    ->alignCenter()
                     ->badge(),
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
@@ -56,13 +84,22 @@ class RegistrationVehiclesTable
             ->filters([
                 //
             ])
-            ->recordActions([
-                EditAction::make(),
+            ->groups([
+            Group::make('company.name')
+                    ->label('Đơn vị')
+                    ->titlePrefixedWithLabel(false)
+                    ->collapsible(),
             ])
+            ->defaultGroup('company.name')
+            ->recordActions([
+                EditAction::make()
+                    ->iconButton(),
+                DeleteAction::make()
+                    ->iconButton(),
+            ],position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                ApprovesAction::make(),
+                DeleteBulkAction::make()
             ]);
     }
 }

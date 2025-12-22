@@ -22,11 +22,11 @@ class RegistrationDirectlyForm
                         TextInput::make('name')
                             ->label('Họ và tên')
                             ->required()
-                            ->columnSpan(2),
+                            ->columnSpan(3),
                         TextInput::make('id_card')
                             ->label('CMND/CCCD')
                             ->required()
-                            ->columnSpan(2),
+                            ->columnSpan(3),
                         TextInput::make('license_plate')
                             ->label('Biển số xe')
                             ->required()
@@ -34,11 +34,18 @@ class RegistrationDirectlyForm
                         TextInput::make('load_capacity')
                             ->label('Tải trọng')
                             ->required()
-                            ->columnSpan(1),
+                            ->columnSpan(2),
                         TextInput::make('entry_gate')
                             ->label('Cổng vào')
                             ->numeric()
-                            ->columnSpan(1),
+                            ->columnSpan(2),
+                        DateTimePicker::make('expected_arrival_time')
+                            ->label('Thời gian dự kiến vào')
+                            ->format('d/m/Y H:i')
+                            ->seconds(false)
+                            ->required()
+                            ->columnSpan(2),
+                       
                         DateTimePicker::make('start_date')
                             ->label('Giờ vào')
                             ->format('d/m/Y H:i')
@@ -51,7 +58,6 @@ class RegistrationDirectlyForm
                             ->seconds(false)
                             ->required()
                             ->columnSpan(2),
-
                         // Select::make('status')
                         //     ->label('Trạng thái')
                         //     ->options(
@@ -68,7 +74,7 @@ class RegistrationDirectlyForm
                         Textarea::make('notes')
                             ->label('Ghi chú')
                             ->columnSpanFull(),
-                    ])->columns(4)
+                    ])->columns(6)
             ]);
     }
 }

@@ -2,6 +2,7 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/livewire/**/*';
 
 /* Add your custom styles below */
 
@@ -14,3 +15,15 @@ table.fi-ta-table thead .fi-ta-header-cell {
     border: 1px solid #ffffff !important;
     font-weight: 600;
 }
+.fi-ta-header-group-cell{
+    color: #ffffff !important;
+}
+
+.fi-ta-group-header-cell{
+    background-color: rgb(226, 232, 247) !important;
+}
+
+.fi-ta-cell.fi-ta-group-selection-cell {
+    background-color: rgb(226, 232, 247) !important;
+}
+
