@@ -158,7 +158,6 @@ class ImportAction
                                 'gateway' => $gatewayName,
                             ];
                         }
-                        // dd($row[5]);
                         $importedVehicles[] = [
                             'driver_name' => $row[0] ?? '',
                             'driver_id_card' => $row[1] ?? '',

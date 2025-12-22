@@ -40,8 +40,8 @@ class RegistrationDirectliesTable
                     ->alignCenter()
                     ->searchable(),
                 TextColumn::make('expected_arrival_time')
-                    ->label('Giờ vào dự kiến')
-                    ->dateTime('d/m/Y H:i')
+                    ->label('Ngày vào dự kiến')
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->width('150px')
                     ->alignCenter(),
@@ -105,12 +105,12 @@ class RegistrationDirectliesTable
                     ->hidden(fn ($record) => ($record?->status ?? null) !== 'entering')
                     ->button(),
                 EditAction::make()
-                    ->label("")
+                    ->label('')
                     ->button(),
                 DeleteAction::make()
-                    ->label("")
+                    ->label('')
                     ->button(),
-            ],position: RecordActionsPosition::BeforeColumns)
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

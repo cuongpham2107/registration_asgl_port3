@@ -4,10 +4,10 @@ namespace App\Filament\Resources\RegistrationDirectlies\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class RegistrationDirectlyForm
 {
@@ -16,7 +16,7 @@ class RegistrationDirectlyForm
         return $schema
             ->components([
                 Section::make('Thông tin')
-                    ->description('Nhập thông tin xe ra vào') 
+                    ->description('Nhập thông tin xe ra vào')
                     ->columnSpanFull()
                     ->schema(components: [
                         TextInput::make('name')
@@ -41,12 +41,12 @@ class RegistrationDirectlyForm
                             ->relationship('gateway', 'name')
                             ->columnSpan(2),
                         DateTimePicker::make('expected_arrival_time')
-                            ->label('Thời gian dự kiến vào')
-                            ->format('d/m/Y H:i')
+                            ->label('Ngày vào dự kiến')
+                            ->format('d/m/Y')
                             ->seconds(false)
                             ->required()
                             ->columnSpan(2),
-                       
+
                         DateTimePicker::make('start_date')
                             ->label('Giờ vào')
                             ->format('d/m/Y H:i')
@@ -75,7 +75,7 @@ class RegistrationDirectlyForm
                         Textarea::make('notes')
                             ->label('Ghi chú')
                             ->columnSpanFull(),
-                    ])->columns(6)
+                    ])->columns(6),
             ]);
     }
 }

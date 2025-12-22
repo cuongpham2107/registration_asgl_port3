@@ -3,14 +3,13 @@
 namespace App\Filament\Resources\RegistrationVehicles\Tables;
 
 use App\Filament\Resources\RegistrationVehicles\Actions\ApprovesAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Grouping\Group;
+use Filament\Tables\Table;
 
 class RegistrationVehiclesTable
 {
@@ -40,7 +39,7 @@ class RegistrationVehiclesTable
                     ->searchable(),
                 TextColumn::make('expected_arrival_time')
                     ->label('Thời gian dự kiến vào')
-                    ->dateTime('d/m/Y H:i')
+                    ->dateTime('d/m/Y')
                     ->sortable(),
                 TextColumn::make('company.name')
                     ->label('Thuộc đơn vị')
@@ -85,7 +84,7 @@ class RegistrationVehiclesTable
                 //
             ])
             ->groups([
-            Group::make('company.name')
+                Group::make('company.name')
                     ->label('Đơn vị')
                     ->titlePrefixedWithLabel(false)
                     ->collapsible(),
@@ -96,10 +95,10 @@ class RegistrationVehiclesTable
                     ->iconButton(),
                 DeleteAction::make()
                     ->iconButton(),
-            ],position: RecordActionsPosition::BeforeColumns)
+            ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 ApprovesAction::make(),
-                DeleteBulkAction::make()
+                DeleteBulkAction::make(),
             ]);
     }
 }
