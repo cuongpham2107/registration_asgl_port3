@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "bezhansalleh/filament-shield": "^4.0",
         "filament/filament": "^4.3",
         "filament/forms": "^4.3",
         "laravel/framework": "^12.0",

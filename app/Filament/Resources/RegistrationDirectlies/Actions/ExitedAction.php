@@ -50,7 +50,7 @@ class ExitedAction
                     $pdf = Pdf::loadView('pdf.invoice', ['record' => $data]);
 
                     // Save PDF to storage
-                    $filename = 'invoice-'.$record->id.'-'.now()->format('YmdHis').'.pdf';
+                    $filename = 'invoice-'.$record->name.'-'.$record->id_card.'-'.$record->license_plate.'-'.now()->format('YmdHis').'.pdf';
                     $path = 'invoices/'.$filename;
                     \Illuminate\Support\Facades\Storage::disk('public')->put($path, $pdf->output());
 

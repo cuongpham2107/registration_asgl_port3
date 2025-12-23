@@ -46,7 +46,6 @@ class RegistrationDirectlyForm
                             ->seconds(false)
                             ->required()
                             ->columnSpan(2),
-
                         DateTimePicker::make('start_date')
                             ->label('Giờ vào')
                             ->format('d/m/Y H:i')

@@ -14,14 +14,14 @@ class ListRegistrationDirectlies extends ListRecords
     {
         return [
             CreateAction::make()
-                ->label('Thêm xe ra vào')
-                ->modalHeading('Thêm xe ra vào')
+                ->label('Thêm xe vào kiểm hoá')
+                ->modalHeading('Thêm xe vào kiểm hoá')
                 ->slideOver(),
         ];
     }
 
     public function getHeading(): string
     {
-        return "Danh sách xe ra vào";
+        return 'Danh sách xe vào kiểm hoá';
     }
 }

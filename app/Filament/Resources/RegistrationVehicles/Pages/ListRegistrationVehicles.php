@@ -14,15 +14,15 @@ class ListRegistrationVehicles extends ListRecords
     {
         return [
             CreateAction::make()
-                ->label('Thêm đăng ký xe khai thác')
+                ->label('Thêm đăng ký xe kiểm hoá')
                 ->icon('heroicon-o-plus')
-                ->modalHeading('Thêm đăng ký xe khai thác')
+                ->modalHeading('Thêm đăng ký xe kiểm hoá')
                 ->slideOver(),
         ];
     }
 
     public function getHeading(): string
     {
-        return "Danh sách đăng ký xe khai thác";
+        return 'Danh sách đăng ký xe kiểm hoá';
     }
 }

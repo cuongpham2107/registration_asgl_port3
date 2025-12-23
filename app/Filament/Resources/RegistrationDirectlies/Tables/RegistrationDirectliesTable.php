@@ -4,31 +4,53 @@ namespace App\Filament\Resources\RegistrationDirectlies\Tables;
 
 use App\Filament\Resources\RegistrationDirectlies\Actions\EnteringAction;
 use App\Filament\Resources\RegistrationDirectlies\Actions\ExitedAction;
+use App\Filament\Resources\RegistrationDirectlies\Filters\ListFilters;
+use App\Models\RegistrationDirectly;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Enums\RecordActionsPosition;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RegistrationDirectliesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-
+            ->emptyStateHeading('Không có kiểm hoá nào')
+            ->emptyStateDescription('Hiện tại chưa có kiểm hoá nào.')
+            ->modifyQueryUsing(fn (Builder $query) => $query->orderByRaw("CASE 
+                WHEN status = 'waiting_entry' THEN 1 
+                WHEN status = 'entering' THEN 2 
+                WHEN status = 'exited' THEN 3 
+                ELSE 4 
+            END"))
             ->columns([
                 TextColumn::make('name')
                     ->label('Họ và tên')
+                    ->formatStateUsing(
+                        fn (RegistrationDirectly $record): string => isset(explode('|', $record->name)[0]) ? trim(explode('|', mb_convert_case($record->name, MB_CASE_TITLE, 'UTF-8'))[0]) : mb_convert_case($record->name, MB_CASE_TITLE, 'UTF-8')
+                    )
+                    ->weight(FontWeight::Bold)
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('id_card')
                     ->label('CMND/CCCD')
+                    ->alignCenter()
+                    ->weight(FontWeight::Bold)
                     ->searchable(),
                 TextColumn::make('license_plate')
                     ->label('Biển số xe')
+                    ->alignCenter()
+                    ->weight(FontWeight::Bold)
                     ->searchable(),
                 TextColumn::make('loadCapacity.name')
                     ->label('Tải trọng')
@@ -90,8 +112,10 @@ class RegistrationDirectliesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                ListFilters::make(),
+            ], layout: FiltersLayout::AboveContent)
+            // ->persistFiltersInSession()
+            ->deferFilters(false)
             ->recordActions([
                 EnteringAction::make()
                     ->label('Vào')
@@ -104,12 +128,14 @@ class RegistrationDirectliesTable
                     ->color('danger')
                     ->hidden(fn ($record) => ($record?->status ?? null) !== 'entering')
                     ->button(),
-                EditAction::make()
-                    ->label('')
-                    ->button(),
-                DeleteAction::make()
-                    ->label('')
-                    ->button(),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->slideOver(),
+                    DeleteAction::make(),
+                ])->icon('heroicon-m-adjustments-vertical')
+                    ->size(Size::Small)
+                    ->iconButton()
+                    ->color('gray')->link()->label(''),
             ], position: RecordActionsPosition::BeforeColumns)
             ->toolbarActions([
                 BulkActionGroup::make([
