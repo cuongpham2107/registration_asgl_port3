@@ -2,7 +2,12 @@
 
 namespace App\Livewire;
 
-use Filament\Actions\Action;
+use App\Filament\Resources\RegistrationVehicles\Actions\ImportAction;
+use App\Models\Company;
+use App\Models\Gateway;
+use App\Models\LoadCapacity;
+use App\Models\RegistrationVehicle;
+use Carbon\Carbon;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DateTimePicker;
@@ -13,22 +18,16 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Icon;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
-use App\Models\Company;
-use App\Models\Gateway;
-use App\Models\LoadCapacity;
-use App\Models\RegistrationVehicle;
 use Illuminate\Support\HtmlString;
-use Filament\Notifications\Notification;
 use Livewire\Component;
-use App\Filament\Resources\RegistrationVehicles\Actions\ImportAction;
-use Filament\Schemas\Components\Icon;
-use Filament\Support\Icons\Heroicon;
 
 class RegistrationVehicleForm extends Component implements HasActions, HasForms
 {
@@ -49,19 +48,22 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
     {
         if ($this->activeForm === 'organization') {
             return $schema
-                
+
                 ->components([
                     // form hiển thị đơn vị
                     Section::make('Thông tin đơn vị')
                         ->description('Đơn vị đăng ký')
                         ->columnSpanFull()
-                        ->columns(6)
+                        ->columns([
+                            'default' => 1,
+                            'md' => 6,
+                        ])
                         ->schema([
                             Select::make('company_id')
                                 ->label('Chọn đơn vị nếu có (để tự động điền thông tin)')
                                 ->belowLabel([
                                     Icon::make(Heroicon::ShieldExclamation),
-                                    new HtmlString('<span class="italic font-light text-blue-600">Chọn đơn vị đã có để tự động điền thông tin bên dưới, hoặc để trống để tạo đơn vị mới.</span>')
+                                    new HtmlString('<span class="italic font-light text-blue-600">Chọn đơn vị đã có để tự động điền thông tin bên dưới, hoặc để trống để tạo đơn vị mới.</span>'),
                                 ])
                                 ->options(Company::pluck('name', 'id'))
                                 ->live()
@@ -78,34 +80,49 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             TextInput::make('name')
                                 ->label('Tên đơn vị')
                                 ->required()
-                                ->disabled(fn (callable $get) => !empty($get('company_id')))
+                                ->disabled(fn (callable $get) => ! empty($get('company_id')))
                                 ->dehydrated(fn (callable $get) => empty($get('company_id')))
-                                ->columnSpan(3),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 3,
+                                ]),
                             TextInput::make('tax_number')
                                 ->label('Mã số thuế')
-                                ->disabled(fn (callable $get) => !empty($get('company_id')))
+                                ->disabled(fn (callable $get) => ! empty($get('company_id')))
                                 ->dehydrated(fn (callable $get) => empty($get('company_id')))
                                 ->required()
-                                ->columnSpan(3),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 3,
+                                ]),
                             TextInput::make('address')
                                 ->label('Địa chỉ')
-                                ->disabled(fn (callable $get) => !empty($get('company_id')))
+                                ->disabled(fn (callable $get) => ! empty($get('company_id')))
                                 ->dehydrated(fn (callable $get) => empty($get('company_id')))
-                                ->columnSpan(2),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                ]),
                             TextInput::make('phone_number')
                                 ->label('Số điện thoại')
                                 ->tel()
                                 ->required()
-                                ->disabled(fn (callable $get) => !empty($get('company_id')))
+                                ->disabled(fn (callable $get) => ! empty($get('company_id')))
                                 ->dehydrated(fn (callable $get) => empty($get('company_id')))
-                                ->columnSpan(2),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                ]),
                             TextInput::make('email')
                                 ->label('Email')
                                 ->email()
                                 ->required()
-                                ->disabled(fn (callable $get) => !empty($get('company_id')))
+                                ->disabled(fn (callable $get) => ! empty($get('company_id')))
                                 ->dehydrated(fn (callable $get) => empty($get('company_id')))
-                                ->columnSpan(2),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                ]),
                         ]),
                     Repeater::make('registration_vehicles')
                         ->label('Danh sách xe đăng ký')
@@ -156,36 +173,58 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                 Section::make('Thông tin đăng ký xe')
                     ->description('Cá nhân đăng ký')
                     ->columnSpanFull()
-                    ->columns(6)
+                    ->columns([
+                        'default' => 2,
+                        'md' => 6,
+                    ])
                     ->schema([
                         TextInput::make('driver_name')
                             ->label('Tên lái xe')
                             ->required()
-                            ->columnSpan(3),
+                            ->columnSpan([
+                                'default' => 'full',
+                                'md' => 3,
+                            ]),
                         TextInput::make('driver_id_card')
                             ->label('CMND/CCCD')
                             ->required()
-                            ->columnSpan(3),
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 3,
+                            ]),
                         TextInput::make('license_plate')
                             ->label('Biển số xe')
                             ->required()
-                            ->columnSpan(2),
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 2,
+                            ]),
                         Select::make(name: 'id_load_capacity')
                             ->label('Tải trọng')
                             ->required()
                             ->options(LoadCapacity::pluck('name', 'id'))
-                            ->columnSpan(2),
+                            ->columnSpan([
+                                'default' => 'full',
+                                'md' => 2,
+                            ]),
                         Select::make('id_gateway')
                             ->label('Cổng vào')
                             ->required()
                             ->options(Gateway::pluck('name', 'id'))
-                            ->columnSpan(2),
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 2,
+                            ]),
                         DateTimePicker::make('expected_arrival_time')
                             ->label('Thời gian dự kiến vào')
                             ->format('d/m/Y H:i')
                             ->seconds(false)
+                            ->native(false)
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpan([
+                                'default' => 1,
+                                'md' => 'full',
+                            ]),
                         Select::make('company_id')
                             ->label('Thuộc đơn vị')
                             ->options(Company::pluck('name', 'id'))
@@ -196,7 +235,10 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             ->columnSpanFull(),
                     ]),
             ])
-            ->columns(6)
+            ->columns([
+                'default' => 1,
+                'md' => 6,
+            ])
             ->statePath('data');
     }
 
@@ -246,6 +288,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
             foreach ($validator->errors()->getMessages() as $field => $messages) {
                 $this->addError($field, implode(' ', $messages));
             }
+
             return;
         }
 
@@ -260,6 +303,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                 if ($tax && Company::where('tax_number', $tax)->exists()) {
                     $this->addError('tax_number', 'Mã số thuế đã tồn tại. Vui lòng kiểm tra lại.');
                     DB::rollBack();
+
                     return;
                 }
 
@@ -278,6 +322,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                 if (! $company) {
                     $this->addError('company_id', 'Đơn vị được chọn không tồn tại.');
                     DB::rollBack();
+
                     return;
                 }
 
@@ -311,7 +356,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                     'expected_arrival_time' => $expectedCarbon,
                     'notes' => $rv['notes'] ?? null,
                     'company_id' => $companyId,
-                    
+
                     'status' => 'pending_approval',
                 ]);
             }
