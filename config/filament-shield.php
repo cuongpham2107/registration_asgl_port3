@@ -16,7 +16,7 @@ return [
     */
 
     'shield_resource' => [
-        'slug' => 'roles',
+        'slug' => 'shield/roles',
         'show_model_path' => true,
         'cluster' => null,
         'tabs' => [
@@ -147,7 +147,7 @@ return [
     */
 
     'localization' => [
-        'enabled' => true,
+        'enabled' => false,
         'key' => 'filament-shield::filament-shield.resource_permission_prefixes_labels',
     ],
 

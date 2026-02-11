@@ -21,5 +21,10 @@ class RegistrationDirectly extends Model
     public function gateway(): BelongsTo
     {
         return $this->belongsTo(Gateway::class, 'id_gateway');
-    }   
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'registration_directly_id');
+    }
 }

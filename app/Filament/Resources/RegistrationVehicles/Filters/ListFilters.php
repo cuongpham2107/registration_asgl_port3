@@ -27,8 +27,7 @@ class ListFilters
                         'entered' => 'Đã vào',
                         'exited' => 'Đã ra',
                         'rejected' => 'Từ chối',
-                    ])
-                    ->default('pending_approval'),
+                    ]),
                 DatePicker::make('filter_start_date')
                     ->label('Từ ngày')
                     ->placeholder('Chọn ngày bắt đầu')

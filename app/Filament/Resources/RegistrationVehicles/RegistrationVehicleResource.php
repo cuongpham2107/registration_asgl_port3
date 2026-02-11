@@ -20,7 +20,7 @@ class RegistrationVehicleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $navigationLabel = 'Đăng ký xe khai thác';
+    protected static ?string $navigationLabel = 'Đăng ký xe kiểm hoá';
 
     protected static ?string $recordTitleAttribute = 'driver_name';
 

@@ -50,12 +50,14 @@ class RegistrationDirectlyForm
                             ->label('Giờ vào')
                             ->format('d/m/Y H:i')
                             ->seconds(false)
+                            ->disabled()
                             ->required()
                             ->columnSpan(2),
                         DateTimePicker::make('end_date')
                             ->label('Giờ ra')
                             ->format('d/m/Y H:i')
                             ->seconds(false)
+                            ->disabled()
                             ->required()
                             ->columnSpan(2),
                         // Select::make('status')

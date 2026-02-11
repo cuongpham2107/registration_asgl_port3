@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('id_gateway')->nullable()->constrained('gateways')->onDelete('set null');
             $table->timestamp('expected_arrival_time')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamp('approval_date')->nullable();
             // Cần phê duyệt, Đã vào, Đã ra, Đã phê duyệt, Từ chối

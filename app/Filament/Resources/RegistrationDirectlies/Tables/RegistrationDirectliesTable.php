@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\Action;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\ColumnGroup;
@@ -110,6 +111,14 @@ class RegistrationDirectliesTable
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('invoice.invoice_number')
+                    ->label('Hoá đơn')
+                    ->url(fn (RegistrationDirectly $record) => $record->invoice ? \Illuminate\Support\Facades\Storage::disk('public')->url($record->invoice->pdf_path) : null)
+                    ->openUrlInNewTab()
+                    ->placeholder('---')
+                    ->alignCenter()
+                    ->color('primary')
+                    ->weight(FontWeight::Bold),
             ])
             ->filters([
                 ListFilters::make(),

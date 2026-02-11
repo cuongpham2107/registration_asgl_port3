@@ -21,7 +21,7 @@ class RegistrationVehiclesTable
         return $table
             ->description(function () {
                 $user = auth()->user();
-                if (! $user || ! $user->hasRole('approve_vehicle')) {
+                if (! $user || ! $user->hasRole('approve')) {
                     return '';
                 }
 

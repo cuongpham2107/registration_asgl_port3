@@ -81,8 +81,10 @@ class Login extends BaseLogin
                     'password' => Str::password(),
                     'department_name' => $userResponse['positions'][0]['department']['short_code'] ?? null,
                 ]);
+                // tạo user và gắn quyền panel_user
+                $user->assignRole('panel_user');
+
                 
-                // KHÔNG tự động gán role - Admin sẽ gán role thủ công
             }
             Filament::auth()->login($user, $data['remember'] ?? false);
         }

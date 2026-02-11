@@ -17,8 +17,15 @@
                     </div>
                 @endif
 
+                @if (session()->has('error'))
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <x-filament::tabs label="Loại đăng ký" class="mb-4 justify-around">
-                    <x-filament::tabs.item 
+                   
+                     <x-filament::tabs.item 
                         :active="$this->activeForm === 'individual'" 
                         wire:click="setActiveForm('individual')"
                         icon="heroicon-m-user"
@@ -26,7 +33,6 @@
                     >
                         Cá nhân
                     </x-filament::tabs.item>
-                    
                     <x-filament::tabs.item 
                         :active="$this->activeForm === 'organization'" 
                         wire:click="setActiveForm('organization')"
@@ -35,6 +41,7 @@
                     >
                         Tổ chức
                     </x-filament::tabs.item>
+                    
                 </x-filament::tabs>
 
                 @if ($this->activeForm === 'organization')

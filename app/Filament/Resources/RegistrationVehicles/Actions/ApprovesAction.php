@@ -17,6 +17,9 @@ class ApprovesAction
             ->button()
             ->color('primary')
             ->icon('heroicon-o-check-circle')
+            ->modalHeading('Duyệt đăng ký')
+            ->requiresConfirmation()
+            ->modalDescription('Bạn có chắc chắn muốn duyệt đăng ký này?')
             ->extraAttributes(['class' => ''])
             ->action(function (Collection $records) {
                 try {

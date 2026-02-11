@@ -25,8 +25,7 @@ class ListFilters
                         'waiting_entry' => 'Chờ vào',
                         'entering' => 'Đang vào',
                         'exited' => 'Đã ra',
-                    ])
-                    ->default('waiting_entry'),
+                    ]),
                 DatePicker::make('filter_start_date')
                     ->label('Từ ngày')
                     ->placeholder('Chọn ngày bắt đầu')
@@ -58,17 +57,24 @@ class ListFilters
                     )
                     ->when(
                         ($data['filter_start_date'] ?? null) && ! ($data['filter_end_date'] ?? null),
-                        fn (Builder $query) => $query->whereDate('start_date', Carbon::parse($data['filter_start_date'], 'Asia/Ho_Chi_Minh'))
+                        fn (Builder $query) => $query->where(function (Builder $query) use ($data) {
+                            $startDate = Carbon::parse($data['filter_start_date'], 'Asia/Ho_Chi_Minh')->startOfDay();
+                            return $query->where(function (Builder $subQuery) use ($startDate) {
+                                $subQuery->where('start_date', '>=', $startDate)
+                                    ->orWhere('expected_arrival_time', '>=', $startDate);
+                            });
+                        })
                     )
                     ->when(
                         ($data['filter_start_date'] ?? null) && ($data['filter_end_date'] ?? null),
-                        fn (Builder $query) => $query->whereBetween(
-                            'start_date',
-                            [
-                                Carbon::parse($data['filter_start_date'], 'Asia/Ho_Chi_Minh')->startOfDay(),
-                                Carbon::parse($data['filter_end_date'], 'Asia/Ho_Chi_Minh')->endOfDay(),
-                            ]
-                        )
+                        fn (Builder $query) => $query->where(function (Builder $query) use ($data) {
+                            $start = Carbon::parse($data['filter_start_date'], 'Asia/Ho_Chi_Minh')->startOfDay();
+                            $end = Carbon::parse($data['filter_end_date'], 'Asia/Ho_Chi_Minh')->endOfDay();
+                            return $query->where(function (Builder $subQuery) use ($start, $end) {
+                                $subQuery->whereBetween('start_date', [$start, $end])
+                                    ->orWhereBetween('expected_arrival_time', [$start, $end]);
+                            });
+                        })
                     );
             })
             ->indicateUsing(function (array $data): array {

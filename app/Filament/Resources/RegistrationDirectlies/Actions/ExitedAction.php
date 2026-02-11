@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\RegistrationDirectlies\Actions;
 
+use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -13,10 +14,8 @@ class ExitedAction
         return Action::make('exited')
             ->action(function ($record) {
                 try {
-                    // pass data as array to loadView
-
                     $record->update([
-                        // 'status' => 'exited',
+                        'status' => 'exited',
                         'end_date' => now(),
                     ]);
 
@@ -56,6 +55,20 @@ class ExitedAction
 
                     // Get the public URL for the file
                     $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+
+                    // Save invoice to database
+                    $invoiceNumber = 'INV-'.now()->format('Ymd').'-'.$record->id;
+                    Invoice::updateOrCreate(
+                        ['registration_directly_id' => $record->id],
+                        [
+                            'invoice_number' => $invoiceNumber,
+                            'total_hours' => $totalHours,
+                            'price_per_hour' => $selectedPrice,
+                            'total_amount' => $totalHours * $selectedPrice,
+                            'is_daytime' => $isDaytime,
+                            'pdf_path' => $path,
+                        ]
+                    );
 
                     Notification::make()
                         ->title('Cập nhật trạng thái xe ra khỏi cảng thành công.')

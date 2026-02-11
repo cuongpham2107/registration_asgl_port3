@@ -28,6 +28,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\HtmlString;
 use Livewire\Component;
+use Closure;
+use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Database\Eloquent\Model;
 
 class RegistrationVehicleForm extends Component implements HasActions, HasForms
 {
@@ -155,13 +158,22 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                                 ->required()
                                 ->options(Gateway::pluck('name', 'id')),
                             DateTimePicker::make('expected_arrival_time')
-                                ->format('d/m/Y H:i')
+                                ->displayFormat('d/m/Y H:i')
                                 ->seconds(false)
                                 ->native(false)
-                                ->required(),
+                                ->required()
+                                ->rules([
+                                    fn(Get $get, ?Model $record): Closure => function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                        if (($record['status'] ?? null) != 'sent') {
+                                            if (Carbon::parse($value, 'Asia/Ho_Chi_Minh')->lessThanOrEqualTo(Carbon::now('Asia/Ho_Chi_Minh'))) {
+                                                $fail('Ngày, giờ phải lớn hơn ngày, giờ hiện tại.');
+                                            }
+                                        }
+
+                                    }
+                                ]),
                             Textarea::make('notes')
-                                ->rows(1)
-                                ->required(),
+                                ->rows(1),
                         ])->columnSpanFull(),
                 ])
                 ->statePath('data');
@@ -175,22 +187,24 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                     ->columnSpanFull()
                     ->columns([
                         'default' => 2,
-                        'md' => 6,
+                        'md' => 4,
                     ])
+                    
                     ->schema([
                         TextInput::make('driver_name')
                             ->label('Tên lái xe')
                             ->required()
+                            ->autofocus()
                             ->columnSpan([
                                 'default' => 'full',
-                                'md' => 3,
+                                'md' => 2,
                             ]),
                         TextInput::make('driver_id_card')
                             ->label('CMND/CCCD')
                             ->required()
                             ->columnSpan([
                                 'default' => 1,
-                                'md' => 3,
+                                'md' => 2,
                             ]),
                         TextInput::make('license_plate')
                             ->label('Biển số xe')
@@ -217,13 +231,23 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             ]),
                         DateTimePicker::make('expected_arrival_time')
                             ->label('Thời gian dự kiến vào')
-                            ->format('d/m/Y H:i')
+                            ->displayFormat('d/m/Y H:i')
                             ->seconds(false)
                             ->native(false)
                             ->required()
                             ->columnSpan([
                                 'default' => 1,
-                                'md' => 'full',
+                                'md' => '2',
+                            ])
+                            ->rules([
+                                fn(Get $get, ?Model $record): Closure => function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                    if (($record['status'] ?? null) != 'sent') {
+                                        if (Carbon::parse($value, 'Asia/Ho_Chi_Minh')->lessThanOrEqualTo(Carbon::now('Asia/Ho_Chi_Minh'))) {
+                                            $fail('Ngày, giờ phải lớn hơn ngày, giờ hiện tại.');
+                                        }
+                                    }
+
+                                }
                             ]),
                         Select::make('company_id')
                             ->label('Thuộc đơn vị')
@@ -234,10 +258,6 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                             ->label('Ghi chú')
                             ->columnSpanFull(),
                     ]),
-            ])
-            ->columns([
-                'default' => 1,
-                'md' => 6,
             ])
             ->statePath('data');
     }
@@ -252,17 +272,38 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
         $this->form->fill(); // Reset form when switching
     }
 
-    public function create(): void
+    public function create()
     {
         // Handle individual form submission
         $data = $this->form->getState();
-        dd($data);
-        // TODO: validate and persist; for now just flash success and reset
-        session()->flash('success', 'Đăng ký cá nhân đã được gửi.');
-        $this->form->fill();
+        $rules = [
+            'driver_name' => ['required', 'string'],
+            'driver_id_card' => ['required', 'string'],
+            'license_plate' => ['required', 'string'],
+            'expected_arrival_time' => ['required'],
+            'notes' => ['nullable'],
+        ];
+
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            foreach ($validator->errors()->getMessages() as $field => $messages) {
+                session()->flash('error', $messages[0]);
+            }
+            return;
+        }
+
+        RegistrationVehicle::create($data);
+        
+        Notification::make()
+            ->title('Đăng ký cá nhân đã được gửi.')
+            ->success()
+            ->send();
+            
+        return redirect()->to(route('registration-success'));
     }
 
-    public function createOrganization(): void
+    public function createOrganization()
     {
         // Handle organization form submission
         $data = $this->form->getState();
@@ -286,7 +327,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
 
         if ($validator->fails()) {
             foreach ($validator->errors()->getMessages() as $field => $messages) {
-                $this->addError($field, implode(' ', $messages));
+                session()->flash('error', $messages[0]);
             }
 
             return;
@@ -331,21 +372,8 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
 
             // Create registration vehicles
             foreach ($data['registration_vehicles'] as $rv) {
-                // expected_arrival_time may be a string in 'd/m/Y H:i' format or a Carbon instance
                 $expected = $rv['expected_arrival_time'] ?? null;
-
-                if (is_string($expected)) {
-                    // Try parse d/m/Y H:i first
-                    try {
-                        $expectedCarbon = Carbon::createFromFormat('d/m/Y H:i', $expected);
-                    } catch (\Throwable $e) {
-                        $expectedCarbon = Carbon::parse($expected);
-                    }
-                } elseif ($expected instanceof Carbon) {
-                    $expectedCarbon = $expected;
-                } else {
-                    $expectedCarbon = null;
-                }
+                $expectedCarbon = $expected ? Carbon::parse($expected) : null;
 
                 RegistrationVehicle::create([
                     'driver_name' => $rv['driver_name'] ?? null,
@@ -369,7 +397,7 @@ class RegistrationVehicleForm extends Component implements HasActions, HasForms
                 ->body('Đăng ký tổ chức đã được gửi.')
                 ->send();
 
-            $this->form->fill();
+            return redirect()->to(route('registration-success'));
 
         } catch (\Throwable $e) {
             DB::rollBack();
